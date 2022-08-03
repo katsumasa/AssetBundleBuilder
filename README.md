@@ -1,5 +1,8 @@
 # AssetBundleBuilder
-Simple AssetBundle Build
+
+![GitHub package.json version](https://img.shields.io/github/package-json/v/katsumasa/AssetBundleBuilder)
+
+Simple AssetBundle Build GUI
 
 ## 概要
 
