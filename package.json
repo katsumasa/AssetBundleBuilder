@@ -1,8 +1,8 @@
 {
-  "name": "com.utj.unitycommandlinetools",
+  "name": "com.utj.assetbundlebuilder",
   "version": "0.1.0",
-  "displayName": "UnityCommandLineTools",
-  "description": "UnityCommandLineTools is a package to control the command line tools included in Unity.",
+  "displayName": "AssetBundleBuilder",
+  "description": "Simple GUI to Build AssetBundle",
   "unity": "2018.1",
   "dependencies": {},
   "keywords": [],
