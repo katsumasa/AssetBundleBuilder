@@ -1,0 +1,14 @@
+{
+  "name": "com.utj.assetbundlebuilder",
+  "version": "0.1.0",
+  "displayName": "AssetBundleBuilder",
+  "description": "Simple GUI to Build AssetBundle",
+  "unity": "2018.1",
+  "dependencies": {},
+  "keywords": [],
+  "author": {
+    "name": "Katsumasa.Kimura",
+    "email": "katsumasa@unity3d.com",
+    "url": "https://github.com/katsumasa"
+  }
+}
