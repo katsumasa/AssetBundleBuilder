@@ -9,7 +9,13 @@ Simple AssetBundle Build GUI
 シンプルなAssetBundleをビルドする為のGUIです。
 何か検証する度に毎回記述するのも面倒なのでという場合にお使い下さい。
 
-<img width="400" alt="image" src="https://user-images.githubusercontent.com/29646672/182540536-cb2ab8ae-b4b0-4227-a81f-74971a1dfb96.png">
+### Normalモード
+
+<img width="400" alt="Normal" src="https://user-images.githubusercontent.com/29646672/182540536-cb2ab8ae-b4b0-4227-a81f-74971a1dfb96.png">
+
+### Easyモード
+
+<img width="400" alt="Eazy" src="https://user-images.githubusercontent.com/29646672/182801125-f4024cfa-6308-4568-8568-32c94bf1bd84.png">
 
 ## 使い方
 

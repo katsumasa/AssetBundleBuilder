@@ -30,10 +30,26 @@ namespace UTJ.AssetBundleBuilder
 			public static readonly GUIContent Build = new GUIContent("Build", "Build AssetBundles");
 			public static readonly GUIContent Copy = new GUIContent("Copy", " Copy AssetBundles from AssetBundle to StreamingAssets");
 			public static readonly GUIContent Clear = new GUIContent("Clear", "Claer AssetBundles in StreamingAssets");
+			public static readonly GUIContent CompressMode = new GUIContent("圧縮方法","AssetBundleの圧縮形式には非圧縮・LZMA・LZ4の3種類の中選択から選択可能です。非圧縮の場合、ファイルサイズは大きくなる為、ダウンロード時間、ディスクスペースの使用量は最も大きくなりますが、ロード時間は最短になります。LZMAはファイルサイズは最も小さくなりますが、ロード時にはAssetBunde全体を一括して解凍する必要がある為、ロード時間は最も遅くなります。LZ4はLZMAと比較するとファイルサイズは大きくなりますが、AssetBundle全体を解凍する必要が無い為、読み込み時間はLZMAより早くなります。");
+			
 		}
 
 
 		static AssetBundleBuilderEditorWindow Instance;
+
+		enum OptionMode
+        {
+			Normal,
+			Easy,
+        }
+
+		enum CompressMode
+        {
+			LZMA,	// ファイルサイズは小さくなるがファイル全体を解凍する必要がある為、読み込み時間が長くなる
+			None,	// ファイルサイズは大きくなるが読み込みは早い
+			LZ4,	// LZMAに比較してファイルサイズは大きくなるが、AssetBundle全体を解凍する必要がなく、Asset単位での解凍が行われる
+        }
+
 
 		BuildTarget m_BuildTarget;
 		bool m_UncompressedAssetBundle;
@@ -48,7 +64,8 @@ namespace UTJ.AssetBundleBuilder
 		bool m_DisableLoadAssetByFileName;
 		bool m_DisableLoadAssetByFileNameWithExtension;
 		bool m_AssetBundleStripUnityVersion;
-
+		OptionMode m_OptionMode;
+		CompressMode m_CompressMode;
 
 
 		[MenuItem("Window/UTJ/AssetBundleBuilder")]
@@ -71,21 +88,48 @@ namespace UTJ.AssetBundleBuilder
 
 			EditorGUILayout.Separator();
 
-
-			EditorGUILayout.LabelField(Styles.BuildOptions);
+			m_OptionMode = (OptionMode)EditorGUILayout.EnumPopup(Styles.BuildOptions,m_OptionMode);			
 			EditorGUI.indentLevel++;
-			m_UncompressedAssetBundle = EditorGUILayout.ToggleLeft(Styles.UncompressedAssetBundle, m_UncompressedAssetBundle);
-			m_DisableWriteTypeTree = EditorGUILayout.ToggleLeft(Styles.DisableWriteTypeTree, m_DisableWriteTypeTree);
-			m_DeterministicAssetBundle = EditorGUILayout.ToggleLeft(Styles.DeterministicAssetBundle, m_DeterministicAssetBundle);
-			m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(Styles.ForceRebuildAssetBundle, m_ForceRebuildAssetBundle);
-			m_IgnoreTypeTreeChanges = EditorGUILayout.ToggleLeft(Styles.IgnoreTypeTreeChanges, m_IgnoreTypeTreeChanges);
-			m_AppendHashToAssetBundleName = EditorGUILayout.ToggleLeft(Styles.AppendHashToAssetBundleName, m_AppendHashToAssetBundleName);
-			m_ChunkBasedCompression = EditorGUILayout.ToggleLeft(Styles.ChunkBasedCompression, m_ChunkBasedCompression);
-			m_StrictMode = EditorGUILayout.ToggleLeft(Styles.StrictMode, m_StrictMode);
-			m_DryRunBuild = EditorGUILayout.ToggleLeft(Styles.DryRunBuild, m_DryRunBuild);
-			m_DisableLoadAssetByFileName = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileName, m_DisableLoadAssetByFileName);
-			m_DisableLoadAssetByFileNameWithExtension = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileNameWithExtension, m_DisableLoadAssetByFileNameWithExtension);
-			m_AssetBundleStripUnityVersion = EditorGUILayout.ToggleLeft(Styles.AssetBundleStripUnityVersion, m_AssetBundleStripUnityVersion);
+			if (m_OptionMode == OptionMode.Normal)
+			{
+				m_UncompressedAssetBundle = EditorGUILayout.ToggleLeft(Styles.UncompressedAssetBundle, m_UncompressedAssetBundle);
+				m_DisableWriteTypeTree = EditorGUILayout.ToggleLeft(Styles.DisableWriteTypeTree, m_DisableWriteTypeTree);
+				m_DeterministicAssetBundle = EditorGUILayout.ToggleLeft(Styles.DeterministicAssetBundle, m_DeterministicAssetBundle);
+				m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(Styles.ForceRebuildAssetBundle, m_ForceRebuildAssetBundle);
+				m_IgnoreTypeTreeChanges = EditorGUILayout.ToggleLeft(Styles.IgnoreTypeTreeChanges, m_IgnoreTypeTreeChanges);
+				m_AppendHashToAssetBundleName = EditorGUILayout.ToggleLeft(Styles.AppendHashToAssetBundleName, m_AppendHashToAssetBundleName);
+				m_ChunkBasedCompression = EditorGUILayout.ToggleLeft(Styles.ChunkBasedCompression, m_ChunkBasedCompression);
+				m_StrictMode = EditorGUILayout.ToggleLeft(Styles.StrictMode, m_StrictMode);
+				m_DryRunBuild = EditorGUILayout.ToggleLeft(Styles.DryRunBuild, m_DryRunBuild);
+				m_DisableLoadAssetByFileName = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileName, m_DisableLoadAssetByFileName);
+				m_DisableLoadAssetByFileNameWithExtension = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileNameWithExtension, m_DisableLoadAssetByFileNameWithExtension);
+				m_AssetBundleStripUnityVersion = EditorGUILayout.ToggleLeft(Styles.AssetBundleStripUnityVersion, m_AssetBundleStripUnityVersion);
+			}
+			else
+            {
+				m_CompressMode = (CompressMode)EditorGUILayout.EnumPopup(Styles.CompressMode,m_CompressMode);
+                switch (m_CompressMode)
+                {
+					case CompressMode.None:
+						m_UncompressedAssetBundle = true;
+						m_ChunkBasedCompression = false;
+						break;
+
+					case CompressMode.LZMA:
+						m_UncompressedAssetBundle = false;
+						m_ChunkBasedCompression = false;
+						break;
+
+					case CompressMode.LZ4:
+						m_UncompressedAssetBundle = false;
+						m_ChunkBasedCompression = true;
+						break;
+				}			
+				
+				m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(new GUIContent("強制ビルド","全てのAssetBundleを強制的にビルドします"), m_ForceRebuildAssetBundle);
+						
+
+			}
 			EditorGUI.indentLevel--;
 
 			EditorGUILayout.Separator();
@@ -112,7 +156,12 @@ namespace UTJ.AssetBundleBuilder
 				{
 					System.IO.Directory.CreateDirectory(fpath);
 				}
-				BuildPipeline.BuildAssetBundles(fpath, assetBundleOptions, m_BuildTarget);
+				if(m_OptionMode == OptionMode.Easy)
+                {
+					assetBundleOptions |= BuildAssetBundleOptions.StrictMode;
+				}
+				var assetbundleManifest = BuildPipeline.BuildAssetBundles(fpath, assetBundleOptions, m_BuildTarget);
+				EditorUtility.DisplayDialog("Build AssetBundle", assetbundleManifest != null? "Sucsess" : "Error","OK");
 			}
 
 			if (GUILayout.Button(Styles.Copy))
