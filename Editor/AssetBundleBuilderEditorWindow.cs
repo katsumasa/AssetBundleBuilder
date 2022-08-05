@@ -17,7 +17,7 @@ namespace UTJ.AssetBundleBuilder
 			public static readonly GUIContent BuildOptions = new GUIContent("Build Options", "AssetBundleビルド時のオプション");
 			public static readonly GUIContent UncompressedAssetBundle = new GUIContent("Uncompressed AssetBundle", "AssetBundleを圧縮しない");
 			public static readonly GUIContent DisableWriteTypeTree = new GUIContent("Disable Write TypeTree", "アセットバンドル内にタイプに関する情報を入れないようにします。");
-			public static readonly GUIContent DeterministicAssetBundle = new GUIContent("Deterministic AssetBundle", "アセットバンドルに保管されているオブジェクト ID のハッシュを使用して、アセットバンドルを作成します。");
+			public static readonly GUIContent DeterministicAssetBundle = new GUIContent("Deterministic AssetBundle", "アセットバンドルに保管されているオブジェクト ID のハッシュを使用して、アセットバンドルを作成します。内部的に常に有効となっている為、設定する意味はありません。");
 			public static readonly GUIContent ForceRebuildAssetBundle = new GUIContent("ForceRebuildAssetBundle", "強制的にアセットバンドルを再ビルドします。");
 			public static readonly GUIContent IgnoreTypeTreeChanges = new GUIContent("IgnoreTypeTreeChanges", "インクリメンタルビルドチェックを行う場合、タイプツリーの変更を無視します。");
 			public static readonly GUIContent AppendHashToAssetBundleName = new GUIContent("AppendHashToAssetBundleName", "アセットバンドル名にハッシュを追加します。");
@@ -29,9 +29,9 @@ namespace UTJ.AssetBundleBuilder
 			public static readonly GUIContent AssetBundleStripUnityVersion = new GUIContent("AssetBundleStripUnityVersion", "Disables Asset Bundle LoadAsset by file name with extension.");
 			public static readonly GUIContent Build = new GUIContent("Build", "Build AssetBundles");
 			public static readonly GUIContent Copy = new GUIContent("Copy", " Copy AssetBundles from AssetBundle to StreamingAssets");
-			public static readonly GUIContent Clear = new GUIContent("Clear", "Claer AssetBundles in StreamingAssets");
-			public static readonly GUIContent CompressMode = new GUIContent("圧縮方法","AssetBundleの圧縮形式には非圧縮・LZMA・LZ4の3種類の中選択から選択可能です。非圧縮の場合、ファイルサイズは大きくなる為、ダウンロード時間、ディスクスペースの使用量は最も大きくなりますが、ロード時間は最短になります。LZMAはファイルサイズは最も小さくなりますが、ロード時にはAssetBunde全体を一括して解凍する必要がある為、ロード時間は最も遅くなります。LZ4はLZMAと比較するとファイルサイズは大きくなりますが、AssetBundle全体を解凍する必要が無い為、読み込み時間はLZMAより早くなります。");
-			
+			public static readonly GUIContent ClearAB = new GUIContent("Clear AB", "Claer AssetBundles");
+			public static readonly GUIContent Clear = new GUIContent("Clear StramingAssets", "Claer AssetBundles in StreamingAssets");
+			public static readonly GUIContent CompressMode = new GUIContent("Compress Method","AssetBundleの圧縮形式には非圧縮・LZMA・LZ4の3種類の中選択から選択可能です。非圧縮の場合、ファイルサイズは大きくなる為、ダウンロード時間、ディスクスペースの使用量は最も大きくなりますが、ロード時間は最短になります。LZMAはファイルサイズは最も小さくなりますが、ロード時にはAssetBunde全体を一括して解凍する必要がある為、ロード時間は最も遅くなります。LZ4はLZMAと比較するとファイルサイズは大きくなりますが、AssetBundle全体を解凍する必要が無い為、読み込み時間はLZMAより早くなります。");			
 		}
 
 
@@ -93,17 +93,22 @@ namespace UTJ.AssetBundleBuilder
 			if (m_OptionMode == OptionMode.Normal)
 			{
 				m_UncompressedAssetBundle = EditorGUILayout.ToggleLeft(Styles.UncompressedAssetBundle, m_UncompressedAssetBundle);
-				m_DisableWriteTypeTree = EditorGUILayout.ToggleLeft(Styles.DisableWriteTypeTree, m_DisableWriteTypeTree);
-				m_DeterministicAssetBundle = EditorGUILayout.ToggleLeft(Styles.DeterministicAssetBundle, m_DeterministicAssetBundle);
-				m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(Styles.ForceRebuildAssetBundle, m_ForceRebuildAssetBundle);
-				m_IgnoreTypeTreeChanges = EditorGUILayout.ToggleLeft(Styles.IgnoreTypeTreeChanges, m_IgnoreTypeTreeChanges);
-				m_AppendHashToAssetBundleName = EditorGUILayout.ToggleLeft(Styles.AppendHashToAssetBundleName, m_AppendHashToAssetBundleName);
 				m_ChunkBasedCompression = EditorGUILayout.ToggleLeft(Styles.ChunkBasedCompression, m_ChunkBasedCompression);
-				m_StrictMode = EditorGUILayout.ToggleLeft(Styles.StrictMode, m_StrictMode);
-				m_DryRunBuild = EditorGUILayout.ToggleLeft(Styles.DryRunBuild, m_DryRunBuild);
-				m_DisableLoadAssetByFileName = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileName, m_DisableLoadAssetByFileName);
-				m_DisableLoadAssetByFileNameWithExtension = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileNameWithExtension, m_DisableLoadAssetByFileNameWithExtension);
+				EditorGUILayout.Separator();
 				m_AssetBundleStripUnityVersion = EditorGUILayout.ToggleLeft(Styles.AssetBundleStripUnityVersion, m_AssetBundleStripUnityVersion);
+				m_DisableWriteTypeTree = EditorGUILayout.ToggleLeft(Styles.DisableWriteTypeTree, m_DisableWriteTypeTree);
+				m_DisableLoadAssetByFileName = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileName, m_DisableLoadAssetByFileName);
+				m_DisableLoadAssetByFileNameWithExtension = EditorGUILayout.ToggleLeft(Styles.DisableLoadAssetByFileNameWithExtension, m_DisableLoadAssetByFileNameWithExtension);				
+				EditorGUILayout.Separator();
+				m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(Styles.ForceRebuildAssetBundle, m_ForceRebuildAssetBundle);
+				m_DryRunBuild = EditorGUILayout.ToggleLeft(Styles.DryRunBuild, m_DryRunBuild);				
+				m_IgnoreTypeTreeChanges = EditorGUILayout.ToggleLeft(Styles.IgnoreTypeTreeChanges, m_IgnoreTypeTreeChanges);
+				EditorGUILayout.Separator();
+				m_StrictMode = EditorGUILayout.ToggleLeft(Styles.StrictMode, m_StrictMode);
+				EditorGUILayout.Separator();
+				m_AppendHashToAssetBundleName = EditorGUILayout.ToggleLeft(Styles.AppendHashToAssetBundleName, m_AppendHashToAssetBundleName);
+				EditorGUILayout.Separator();
+				m_DeterministicAssetBundle = EditorGUILayout.ToggleLeft(Styles.DeterministicAssetBundle, m_DeterministicAssetBundle);
 			}
 			else
             {
@@ -126,7 +131,7 @@ namespace UTJ.AssetBundleBuilder
 						break;
 				}			
 				
-				m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(new GUIContent("強制ビルド","全てのAssetBundleを強制的にビルドします"), m_ForceRebuildAssetBundle);
+				m_ForceRebuildAssetBundle = EditorGUILayout.ToggleLeft(Styles.ForceRebuildAssetBundle, m_ForceRebuildAssetBundle);
 						
 
 			}
@@ -134,7 +139,7 @@ namespace UTJ.AssetBundleBuilder
 
 			EditorGUILayout.Separator();
 
-
+			EditorGUILayout.Separator();
 			EditorGUILayout.BeginHorizontal();
 
 			if (GUILayout.Button(Styles.Build))
@@ -184,7 +189,12 @@ namespace UTJ.AssetBundleBuilder
 				CopyDirectory(fpath, dest, true);
 				AssetDatabase.Refresh();
 			}
-
+			if (GUILayout.Button(Styles.ClearAB))
+            {
+                if(System.IO.Directory.Exists(fpath)){
+					Directory.Delete(fpath, true);
+				}
+			}
 			if (GUILayout.Button(Styles.Clear))
 			{
 				var dest = Application.streamingAssetsPath;

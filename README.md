@@ -11,11 +11,12 @@ Simple AssetBundle Build GUI
 
 ### Normalモード
 
-<img width="400" alt="Normal" src="https://user-images.githubusercontent.com/29646672/182540536-cb2ab8ae-b4b0-4227-a81f-74971a1dfb96.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/29646672/182973110-d79f68ea-b8fa-45fe-a8bd-a7d0ceb379c2.png">
 
 ### Easyモード
 
-<img width="400" alt="Eazy" src="https://user-images.githubusercontent.com/29646672/182801125-f4024cfa-6308-4568-8568-32c94bf1bd84.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/29646672/182973200-4cff1393-9f6f-48af-800e-17a7d6428c37.png">
+
 
 ## 使い方
 
@@ -40,7 +41,11 @@ AssetBundleビルド時のオプションです。
 
 ビルドされたAssetBundleをSteramingAssetフォルダーへコピーします。
 
-### Clear
+### Clear AB
+
+ビルド先のAssetBundleを削除します。
+
+### Clear StreamingAssets
 
 StreamingAssetにコピーされたAssetBundleを削除します。
 
