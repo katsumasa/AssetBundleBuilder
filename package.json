@@ -1,6 +1,6 @@
 {
   "name": "com.utj.assetbundlebuilder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "AssetBundleBuilder",
   "description": "Simple GUI to Build AssetBundle",
   "unity": "2018.1",
